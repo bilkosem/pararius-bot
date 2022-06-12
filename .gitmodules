@@ -1,0 +1,3 @@
+[submodule "connectivity_bot"]
+	path = connectivity_bot
+	url = https://github.com/bilkosem/connectivity-bot

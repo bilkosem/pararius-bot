@@ -16,13 +16,8 @@ config = {
     "room": "",
     "type": ""
 }
-xpaths = {
-    "new": "//span[@class='listing-label listing-label--new']"
 
-}
 main_url = "https://www.pararius.com/apartments"
-
-
 
 def configure_telegrambot(token, chat_id):
     TelegramBot.setToken(token)
@@ -35,7 +30,6 @@ def configure_telegrambot(token, chat_id):
     TelegramBot.add_handler(MessageHandler(Filters.text, unknown_text))
 
     # How to get chatId: https://api.telegram.org/bot<YourBOTToken>/getUpdates
-    TelegramBot.send_raw_message("dummy message")
 
     format = TelegramMessageFormat('Header','\ntailer','\n        ','/{}: {}')
     TelegramBot.add_format('help', format, constant_data=TelegramBot.command_desc)
@@ -53,17 +47,17 @@ def sleep_for_seconds(sec):
 def browse_query(query):
     driver.get(query)
 
-    results = driver.find_elements(By.XPATH, xpaths['new'])
+    results = driver.find_elements(By.XPATH, "//span[@class='listing-label listing-label--new']")
     for result in results:
         adress = result.find_element(By.XPATH, "./../../div[@class='listing-search-item__location']").text
-        #link = result.find_element(By.XPATH, "./../../h2[@class='listing-search-item__title']")
+        advert_url = result.find_element(By.XPATH, "./../../h2[@class='listing-search-item__title']/a").get_attribute('href')
+        advert_price = result.find_element(By.XPATH, "./../../div[@class='listing-search-item__price']").text
+        advert_feature = result.find_element(By.XPATH, "./../../div[@class='listing-search-item__features']/ul").text.replace('\n',' | ')
 
         if adress in cached_addresses:
             continue
         else:
-            # Do sth
-            #notify()
-            TelegramBot.send_formatted_message('new_advert',{'Address': adress})
+            TelegramBot.send_formatted_message('new_advert', {'Address': adress, 'Price': advert_price, 'Feature': advert_feature, 'Link':advert_url})
             cached_addresses.append(adress)
     return 0
 

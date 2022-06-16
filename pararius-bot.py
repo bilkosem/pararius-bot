@@ -7,16 +7,6 @@ from connectivity_bot.TelegramHandler import *
 
 cached_addresses = []
 
-config = {
-    "city": ["amsterdam"],
-    "price":{
-        "from":0,
-        "to":0
-    },
-    "room": "",
-    "type": ""
-}
-
 main_url = "https://www.pararius.com/apartments"
 
 def configure_telegrambot(token, chat_id):
@@ -41,7 +31,7 @@ def sleep_for_seconds(sec):
     t = time.localtime()
     current_time = time.strftime("%H:%M:%S", t)
     print("Current Time:", current_time)
-    time.sleep(sec) # retry after 10 minutes
+    time.sleep(sec)
 
 
 def browse_query(query):
@@ -53,11 +43,14 @@ def browse_query(query):
         advert_url = result.find_element(By.XPATH, "./../../h2[@class='listing-search-item__title']/a").get_attribute('href')
         advert_price = result.find_element(By.XPATH, "./../../div[@class='listing-search-item__price']").text
         advert_feature = result.find_element(By.XPATH, "./../../div[@class='listing-search-item__features']/ul").text.replace('\n',' | ')
+        print(f"Address found {adress}")
 
         if adress in cached_addresses:
             continue
         else:
-            TelegramBot.send_formatted_message('new_advert', {'Address': adress, 'Price': advert_price, 'Feature': advert_feature, 'Link':advert_url})
+            message_dict = {'Address': adress, 'Price': advert_price, 'Feature': advert_feature, 'Link':advert_url}
+            print(message_dict)
+            #TelegramBot.send_formatted_message('new_advert', message_dict)
             cached_addresses.append(adress)
     return 0
 
@@ -65,13 +58,13 @@ def browse_query(query):
 def build_queries():
     query_urls = []
 
-    for city in config["city"]:
+    for city in main_config['query']["city"]:
         url = main_url
         url += f'/{city}'
-        if config["price"]["from"] != 0 and config["price"]["to"] != 0:
-            url += f'/{config["price"]["from"]}-{config["price"]["to"]}'
-        url += f'/{config["room"]}-rooms'
-        url += f'/{config["type"]}'
+        if main_config['query']["price"]["from"] != 0 and main_config['query']["price"]["to"] != 0:
+            url += f'/{main_config["query"]["price"]["from"]}-{main_config["query"]["price"]["to"]}'
+        url += f'/{main_config["query"]["room"]}-rooms'
+        url += f'/{main_config["query"]["type"]}'
         query_urls.append(url)
     
     return query_urls
@@ -86,8 +79,14 @@ def application():
 
 if __name__ == "__main__":
     f = open(str(sys.argv[1]),'r')
+
+    main_config = json.load(f)
+
+    f = open(main_config['telegram_config'],'r')
     telegram_config = json.load(f)
-    configure_telegrambot(telegram_config['Telegram']['Token'], telegram_config['Telegram']['ChatId'])
+
+
+    configure_telegrambot(telegram_config['token'], telegram_config['chat_id'])
 
 
     TelegramBot.updater.start_polling()
@@ -95,7 +94,7 @@ if __name__ == "__main__":
     
     chrome_options = Options()
     chrome_options.add_experimental_option("detach", True)
-    driver = webdriver.Chrome("D:\Downloads\chromedriver_win32 (1)\chromedriver.exe")
+    driver = webdriver.Chrome(main_config['chrome_driver'])
     while(True):
         try:
             t = time.localtime()

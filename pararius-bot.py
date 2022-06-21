@@ -23,19 +23,25 @@ def configure_telegrambot(token, chat_id):
 
     format = TelegramMessageFormat('Header','\ntailer','\n        ','/{}: {}')
     TelegramBot.add_format('help', format, constant_data=TelegramBot.command_desc)
-    TelegramBot.send_formatted_message('help')
+    #TelegramBot.send_formatted_message('help')
     new_advert_format = TelegramMessageFormat('New advert found','','\n        ','{}: {}')
     TelegramBot.add_format('new_advert',new_advert_format)
 
-def sleep_for_seconds(sec):
+def sleep_for_minutes(minute):
     t = time.localtime()
     current_time = time.strftime("%H:%M:%S", t)
     print("Current Time:", current_time)
-    time.sleep(sec)
+    time.sleep(minute*60)
 
 
 def browse_query(query):
     driver.get(query)
+
+    # Check if the captcha page is displayed
+    is_captcha = driver.find_elements(By.ID, "_csnl_cp")
+    if is_captcha or not is_captcha:
+        TelegramBot.send_raw_message('Hit to Captcha !!!')
+        raise ValueError('Hit to Captcha !!!')
 
     results = driver.find_elements(By.XPATH, "//span[@class='listing-label listing-label--new']")
     for result in results:
@@ -50,9 +56,8 @@ def browse_query(query):
         else:
             message_dict = {'Address': adress, 'Price': advert_price, 'Feature': advert_feature, 'Link':advert_url}
             print(message_dict)
-            #TelegramBot.send_formatted_message('new_advert', message_dict)
+            TelegramBot.send_formatted_message('new_advert', message_dict)
             cached_addresses.append(adress)
-    return 0
 
 
 def build_queries():
@@ -75,36 +80,38 @@ def application():
     print(queries)
     for query in queries:
         browse_query(query)
-    pass
+
 
 if __name__ == "__main__":
+    # TODO: Add logging
     f = open(str(sys.argv[1]),'r')
-
     main_config = json.load(f)
 
     f = open(main_config['telegram_config'],'r')
     telegram_config = json.load(f)
 
-
     configure_telegrambot(telegram_config['token'], telegram_config['chat_id'])
-
-
     TelegramBot.updater.start_polling()
-    print("after start polling")
     
     chrome_options = Options()
     chrome_options.add_experimental_option("detach", True)
-    driver = webdriver.Chrome(main_config['chrome_driver'])
+
+    if not main_config['enable_display']:
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument("--remote-debugging-port=9222")  
+    
+    driver = webdriver.Chrome(main_config['chrome_driver'], options=chrome_options)
     while(True):
         try:
             t = time.localtime()
             current_time = time.strftime("%H:%M:%S", t)
             print("Current Time:", current_time)
             application()
-            sleep_for_seconds(10)
+                
+            sleep_for_minutes(main_config['polling_interval'])
+        except ValueError as e:
+            print(e)
+            break
         except KeyboardInterrupt:
-            print("keyboard interrupy")
             TelegramBot.updater.stop()
             break
-
-    print("after while")

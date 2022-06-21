@@ -1,13 +1,15 @@
 {
     "query":{
-        "city": ["amsterdam"],
+        "city": ["groningen"],
         "price":{
             "from":0,
             "to":0
         },
-        "room": "",
+        "room": "2",
         "type": ""
     },
+    "enable_display": true,
+    "polling_interval": 15, 
     "telegram_config": "D:\\git\\pararius-bot\\configs\\telegram.json",
     "chrome_driver": "D:\\Downloads\\chromedriver_win32 (1)\\chromedriver.exe"
 }

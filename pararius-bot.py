@@ -4,7 +4,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 import time
 from connectivity_bot.TelegramHandler import *
-
+import os
+import signal
 cached_addresses = []
 
 main_url = "https://www.pararius.com/apartments"
@@ -66,9 +67,13 @@ def build_queries():
     for city in main_config['query']["city"]:
         url = main_url
         url += f'/{city}'
+
         if main_config['query']["price"]["from"] != 0 and main_config['query']["price"]["to"] != 0:
             url += f'/{main_config["query"]["price"]["from"]}-{main_config["query"]["price"]["to"]}'
-        url += f'/{main_config["query"]["room"]}-rooms'
+
+        if main_config["query"]["room"] == "":
+            url += f'/{main_config["query"]["room"]}-rooms'
+        
         url += f'/{main_config["query"]["type"]}'
         query_urls.append(url)
     
@@ -115,3 +120,6 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
             TelegramBot.updater.stop()
             break
+
+    print('Terminating bot')
+    os.kill(os.getpid(), signal.SIGINT)

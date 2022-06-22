@@ -1,0 +1,13 @@
+{
+    "query":{
+        "city": ["groningen"],
+        "price":{
+            "from":0,
+            "to":0
+        },
+        "room": "",
+        "type": ""
+    },
+    "telegram_config": "/mnt/d/git/pararius-bot/configs/telegram.json",
+    "chrome_driver": "/usr/bin/chromedriver"
+}

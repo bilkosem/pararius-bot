@@ -9,12 +9,15 @@ import signal
 cached_addresses = []
 
 main_url = "https://www.pararius.com/apartments"
+is_bot_enabled = True
 
 def configure_telegrambot(token, chat_id):
     TelegramBot.setToken(token)
     TelegramBot.setChatId(chat_id)
 
-    TelegramBot.add_handler(CommandHandler('start', start), description="start desc")
+    TelegramBot.add_handler(CommandHandler('start', start), description="start application")
+    TelegramBot.add_handler(CommandHandler('stop', stop), description="stop application")
+    TelegramBot.add_handler(CommandHandler('kill', TelegramBot.kill), description="kill application")
     TelegramBot.add_handler(CommandHandler('help', TelegramBot.help), description="")
     TelegramBot.add_handler(MessageHandler(Filters.text, unknown))
     TelegramBot.add_handler(MessageHandler(Filters.command, unknown)) 
@@ -27,6 +30,19 @@ def configure_telegrambot(token, chat_id):
     #TelegramBot.send_formatted_message('help')
     new_advert_format = TelegramMessageFormat('New advert found','','\n        ','{}: {}')
     TelegramBot.add_format('new_advert',new_advert_format)
+
+
+def start(update: Update, context: CallbackContext):
+    global is_bot_enabled
+    update.message.reply_text("Starting the bot...")
+    is_bot_enabled = True
+
+
+def stop(update: Update, context: CallbackContext):
+    global is_bot_enabled
+    update.message.reply_text("Stopping the bot...")
+    is_bot_enabled = False
+
 
 def sleep_for_minutes(minute):
     t = time.localtime()
@@ -104,10 +120,16 @@ if __name__ == "__main__":
     if not main_config['enable_display']:
         chrome_options.add_argument('--headless')
         chrome_options.add_argument("--remote-debugging-port=9222")  
-    
-    driver = webdriver.Chrome(main_config['chrome_driver'], options=chrome_options)
+    from webdriver_manager.chrome import ChromeDriverManager
+
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
+    #driver = webdriver.Chrome(main_config['chrome_driver'], options=chrome_options)
     while(True):
+        print('starting a cycle')
         try:
+            if not is_bot_enabled:
+                continue
+
             t = time.localtime()
             current_time = time.strftime("%H:%M:%S", t)
             print("Current Time:", current_time)

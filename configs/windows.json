@@ -1,9 +1,9 @@
 {
     "query":{
-        "city": ["amsterdam"],
+        "city": ["eindhoven"],
         "price":{
-            "from":0,
-            "to":0
+            "from":800,
+            "to":1500
         },
         "room": "2",
         "type": ""
@@ -11,5 +11,5 @@
     "enable_display": false,
     "polling_interval": 15, 
     "telegram_config": "D:\\git\\pararius-bot\\configs\\telegram.json",
-    "chrome_driver": "D:\\Downloads\\chromedriver_win32 (1)\\chromedriver.exe"
+    "chrome_driver": "D:\\Downloads\\chromedriver_win32 (2)\\chromedriver.exe"
 }

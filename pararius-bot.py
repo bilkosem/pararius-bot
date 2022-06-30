@@ -10,6 +10,7 @@ cached_addresses = []
 
 main_url = "https://www.pararius.com/apartments"
 is_bot_enabled = True
+is_first_cycle = True
 
 def configure_telegrambot(token, chat_id):
     TelegramBot.setToken(token)
@@ -52,11 +53,12 @@ def sleep_for_minutes(minute):
 
 
 def browse_query(query):
+    global is_first_cycle
     driver.get(query)
 
     # Check if the captcha page is displayed
     is_captcha = driver.find_elements(By.ID, "_csnl_cp")
-    if is_captcha or not is_captcha:
+    if is_captcha:
         TelegramBot.send_raw_message('Hit to Captcha !!!')
         raise ValueError('Hit to Captcha !!!')
 
@@ -73,8 +75,13 @@ def browse_query(query):
         else:
             message_dict = {'Address': adress, 'Price': advert_price, 'Feature': advert_feature, 'Link':advert_url}
             print(message_dict)
-            TelegramBot.send_formatted_message('new_advert', message_dict)
-            cached_addresses.append(adress)
+
+            # Do not send notification for the first cycle
+            if is_first_cycle:
+                is_first_cycle = False
+            else:
+                TelegramBot.send_formatted_message('new_advert', message_dict)
+                cached_addresses.append(adress)
 
 
 def build_queries():
@@ -115,15 +122,14 @@ if __name__ == "__main__":
     TelegramBot.updater.start_polling()
     
     chrome_options = Options()
-    chrome_options.add_experimental_option("detach", True)
+    #chrome_options.add_experimental_option("detach", True)
 
     if not main_config['enable_display']:
         chrome_options.add_argument('--headless')
         chrome_options.add_argument("--remote-debugging-port=9222")  
-    from webdriver_manager.chrome import ChromeDriverManager
-
-    driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
-    #driver = webdriver.Chrome(main_config['chrome_driver'], options=chrome_options)
+    #from webdriver_manager.chrome import ChromeDriverManager
+    #driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
+    driver = webdriver.Chrome(main_config['chrome_driver'], options=chrome_options)
     while(True):
         print('starting a cycle')
         try:

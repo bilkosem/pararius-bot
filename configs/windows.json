@@ -1,15 +1,20 @@
 {
+    "log":{
+        "level": "DEBUG",
+        "file": "log/pararius.log",
+        "clear": true
+    },
     "query":{
-        "city": ["eindhoven"],
+        "city": ["eindhoven", "den-bosch"],
         "price":{
             "from":800,
-            "to":1500
+            "to":2000
         },
-        "room": "2",
+        "room": "",
         "type": ""
     },
     "enable_display": false,
-    "polling_interval": 15, 
+    "polling_interval": 5, 
     "telegram_config": "D:\\git\\pararius-bot\\configs\\telegram.json",
-    "chrome_driver": "D:\\Downloads\\chromedriver_win32 (2)\\chromedriver.exe"
+    "chrome_driver": "D:\\Downloads\\chromedriver_win32_114.0.5735\\chromedriver.exe"
 }

@@ -8,6 +8,8 @@
         "room": "",
         "type": ""
     },
+    "enable_display": false,
+    "polling_interval": 15, 
     "telegram_config": "/mnt/d/git/pararius-bot/configs/telegram.json",
     "chrome_driver": "/usr/bin/chromedriver"
 }

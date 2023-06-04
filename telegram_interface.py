@@ -5,8 +5,6 @@ from telegram.ext.commandhandler import CommandHandler
 from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
 
-import pandas as pd
-from dataclasses import asdict
 import logging
 
 logger = logging.getLogger('pararius')

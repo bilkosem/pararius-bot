@@ -1,15 +1,20 @@
 {
+    "log":{
+        "level": "DEBUG",
+        "file": "log/pararius.log",
+        "clear": true
+    },
     "query":{
-        "city": ["groningen"],
+        "city": ["eindhoven"],
         "price":{
-            "from":0,
-            "to":0
+            "from":1000,
+            "to":1500
         },
         "room": "",
         "type": ""
     },
     "enable_display": false,
-    "polling_interval": 15, 
-    "telegram_config": "/mnt/d/git/pararius-bot/configs/telegram.json",
+    "polling_interval": 5, 
+    "telegram_config": "configs/telegram.json",
     "chrome_driver": "/usr/bin/chromedriver"
 }

@@ -63,9 +63,9 @@ def sleep_for_minutes(minute):
 def browse_query(query):
     global is_first_cycle, cached_addresses
     driver.get(query)
-
-    # Delay for initial loading
-    time.sleep(1)
+    
+    # Give at least 5 sec to load
+    time.sleep(6)
 
     # Check if the captcha page is displayed
     is_captcha = driver.find_elements(By.ID, "_csnl_cp")

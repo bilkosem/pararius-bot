@@ -9,6 +9,7 @@ import os
 import signal
 import telegram_interface
 import itertools
+import captcha
 
 cached_addresses = []
 
@@ -70,9 +71,33 @@ def browse_query(query):
     # Check if the captcha page is displayed
     is_captcha = driver.find_elements(By.ID, "_csnl_cp")
     if is_captcha:
-        logger.error('Hit to Captcha !!!')
+        logger.warning('Hit to Captcha !!!')
         TelegramBot.send_raw_message('Hit to Captcha !!!')
-        raise ValueError('Hit to Captcha !!!')
+
+        captcha_images = captcha.load_images(driver)
+        logger.info('Number of loaded images: {}'.format(len(captcha_images)))
+
+        captcha_answer = captcha.solve(captcha_images)
+        logger.info('Captcha result evaluated as: {}'.format(captcha_answer))
+
+        # Select the answer
+        driver.find_element(By.ID, str(captcha_answer)).click()
+        time.sleep(0.2)
+
+        # Submit the answer
+        driver.find_element(By.ID, "submit_csnl_cp").click()
+        time.sleep(3)
+
+        # Check if the captcha solved
+        is_captcha_again = driver.find_elements(By.ID, "_csnl_cp")
+        if is_captcha_again:
+            logger.error('Hit to Captcha Again, stopping the bot !!!')
+            TelegramBot.send_raw_message('Hit to Captcha Again, stopping the bot!!!')
+            raise ValueError('Hit to Captcha !!!')
+        else:
+            logger.info('Captcha has been resolved')
+            TelegramBot.send_raw_message('Captcha has been solved !!!')
+
 
     advertisements = []
     results = driver.find_elements(By.XPATH, "//span[@class='listing-label listing-label--new']")

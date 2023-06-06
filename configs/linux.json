@@ -14,7 +14,7 @@
         "type": ""
     },
     "enable_display": false,
-    "polling_interval": 5, 
+    "polling_interval": 10, 
     "telegram_config": "configs/telegram.json",
     "chrome_driver": "/usr/bin/chromedriver"
 }

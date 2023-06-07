@@ -114,7 +114,7 @@ def browse_query(query):
             logger.info('New advertisement found: {}'.format(message_dict))
             advertisements.append(message_dict)
             cached_addresses.append(adress)
-    return advertisements
+    return advertisements[:-1]
 
 
 def build_queries():
@@ -127,7 +127,7 @@ def build_queries():
         if main_config['query']["price"]["from"] != 0 and main_config['query']["price"]["to"] != 0:
             url += f'/{main_config["query"]["price"]["from"]}-{main_config["query"]["price"]["to"]}'
 
-        if main_config["query"]["room"] == "":
+        if main_config["query"]["room"] != "":
             url += f'/{main_config["query"]["room"]}-rooms'
         
         url += f'/{main_config["query"]["type"]}'
@@ -201,9 +201,8 @@ if __name__ == "__main__":
             driver.delete_all_cookies()
             sleep_for_minutes(main_config['polling_interval'])
 
-        except ValueError as e:
-            print(e)
-            break
+        except Exception as e:
+            logger.error(e, exc_info=True)
         except KeyboardInterrupt:
             break
 

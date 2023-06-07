@@ -62,10 +62,11 @@ def sleep_for_minutes(minute):
 
 
 def browse_query(query):
-    global is_first_cycle, cached_addresses
+    global cached_addresses
     driver.get(query)
     
     # Give at least 5 sec to load
+    logger.debug('Waiting 6 sec...')
     time.sleep(6)
 
     # Check if the captcha page is displayed
@@ -114,7 +115,7 @@ def browse_query(query):
             logger.info('New advertisement found: {}'.format(message_dict))
             advertisements.append(message_dict)
             cached_addresses.append(adress)
-    return advertisements[:-1]
+    return advertisements
 
 
 def build_queries():
@@ -139,15 +140,14 @@ def build_queries():
 def application():
     global is_first_cycle
     queries = build_queries()
-    logger.debug(queries)
-
     browsed_advertisements = []
     for query in queries:
-
+        logger.debug("Running query: {}".format(query))
         advertisements = browse_query(query)
         browsed_advertisements.append(advertisements)
 
     browsed_ad_list = list(itertools.chain(*browsed_advertisements))
+    logger.info('Browsed advertisement lists {}'.format(browsed_ad_list))
 
     if is_first_cycle:
         is_first_cycle = False
@@ -155,7 +155,9 @@ def application():
         return
 
     for ad in browsed_ad_list:
-        TelegramBot.send_formatted_message('new_advert', ad)
+        logger.info('Sending ad info: {}'.format(ad))
+        TelegramBot.send_formatted_message('new_advertisement', ad)
+
         time.sleep(0.5)
     
     return  
@@ -189,14 +191,10 @@ if __name__ == "__main__":
             if not is_bot_enabled:
                 continue
 
+            t = time.localtime()
+            current_time = time.strftime("%H:%M:%S", t)
+            print("Current Time:", current_time)
 
-            t = time.localtime()
-            current_time = time.strftime("%H:%M:%S", t)
-            print("Current Time:", current_time)
-                
-            t = time.localtime()
-            current_time = time.strftime("%H:%M:%S", t)
-            print("Current Time:", current_time)
             application()
             driver.delete_all_cookies()
             sleep_for_minutes(main_config['polling_interval'])

@@ -183,11 +183,12 @@ if __name__ == "__main__":
         #chrome_options.add_argument("--remote-debugging-port=9222")  
 
     chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
-    driver = webdriver.Chrome(main_config['chrome_driver'], options=chrome_options)
+
     while(True):
         logger.debug('Iteration started')
         
         try:
+            driver = webdriver.Chrome(main_config['chrome_driver'], options=chrome_options)
             if not is_bot_enabled:
                 continue
 
@@ -197,13 +198,16 @@ if __name__ == "__main__":
 
             application()
             driver.delete_all_cookies()
+            driver.close()
             sleep_for_minutes(main_config['polling_interval'])
 
         except Exception as e:
             logger.error(e, exc_info=True)
+            TelegramBot.send_raw_message('Error: {}'.format(e))
+            break
         except KeyboardInterrupt:
             break
 
     logger.info('Terminating')
-
+    TelegramBot.send_raw_message('Terminating...')
     os.kill(os.getpid(), signal.SIGINT)

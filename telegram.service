@@ -4,5 +4,7 @@ After=multi-user.target
 [Service]
 ExecStart=/home/pi/git/schiphol-bot/run-bot.sh
 User=pi
+Restart=on-failure
+RestartSec=5s
 [Install]
 WantedBy=multi-user.target

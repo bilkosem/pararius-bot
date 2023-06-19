@@ -17,6 +17,7 @@ def init_telegram_bot(token, chat_id):
     TelegramBot.add_handler(CommandHandler('help', TelegramBot.help), description="Print help message")
     TelegramBot.add_handler(CommandHandler('ping', TelegramBot.pong), description="Ping the bot")
     TelegramBot.add_handler(CommandHandler('diagnostics', diagnostics), description="Diagnostic")
+    TelegramBot.add_handler(CommandHandler('check_recordings', check_recordings), description="Check recordings")
     TelegramBot.add_handler(CommandHandler('cli', cli), description="Usage: cli <command>")
 
 
@@ -49,17 +50,20 @@ def diagnostics(update: Update, context: CallbackContext):
     update.message.reply_text(str(output.decode("utf-8")))
     return
 
+def check_recordings(update: Update, context: CallbackContext):
+
+    output = check_output(['tree', '-h', '/mnt/schiphol_drive/recordings/'], stderr=STDOUT, timeout=30)
+    print(output.decode("utf-8"))
+    update.message.reply_text(str(output.decode("utf-8")))
+    return
+
 def cli(update: Update, context: CallbackContext):
     try:
-        if len(context.args) != 1:
-            return
-        
-        command_arg = context.args[0]
-        output = check_output(str(command_arg), stderr=STDOUT, timeout=30)
+        print(context.args)     
+        output = check_output(context.args, stderr=STDOUT, timeout=30)
         print(output.decode("utf-8"))
         update.message.reply_text(str(output.decode("utf-8")))
     except Exception as e:
         print(e)
         update.message.reply_text(str(e))
-
     return

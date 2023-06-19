@@ -15,6 +15,6 @@
     },
     "enable_display": false,
     "polling_interval": 10, 
-    "telegram_config": "configs/telegram.json",
+    "telegram_config": "/home/pi/git/schiphol-bot/configs/telegram.json",
     "chrome_driver": "/usr/bin/chromedriver"
 }

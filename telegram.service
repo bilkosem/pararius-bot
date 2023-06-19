@@ -1,0 +1,8 @@
+[Unit]
+Description=TelegramBot
+After=multi-user.target
+[Service]
+ExecStart=/home/pi/git/schiphol-bot/run-bot.sh
+User=pi
+[Install]
+WantedBy=multi-user.target

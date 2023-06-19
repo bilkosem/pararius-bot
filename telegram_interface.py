@@ -7,8 +7,6 @@ from telegram.ext.filters import Filters
 from subprocess import STDOUT, check_output
 import logging
 
-logger = logging.getLogger('pararius')
-
 def init_telegram_bot(token, chat_id):
     desc_padding = '                '
     body_padding = '\n        '
@@ -61,7 +59,7 @@ def cli(update: Update, context: CallbackContext):
         print(output.decode("utf-8"))
         update.message.reply_text(str(output.decode("utf-8")))
     except Exception as e:
-        logger.error(e, exc_info=True)
+        print(e)
         update.message.reply_text(str(e))
 
     return
